@@ -27,7 +27,7 @@ type Message struct {
 }
 
 type BuzzerPayload struct {
-	Timestamp time.Time `json:"timestamp"`
+	Timestamp int64 `json:"timestamp"`
 }
 
 type BuzzerResponse struct {
@@ -47,7 +47,7 @@ type Hub struct {
 	unregister chan *Client
 
 	state map[*Client]*ClientState
-	lastTimestamp time.Time
+	lastTimestamp int64
 }
 
 func NewHub() *Hub {
@@ -153,8 +153,9 @@ func (h *Hub) run() {
 				}
 
 				h.Lock()
-				if h.lastTimestamp.Before(time.Now().Add(-5 * time.Second)) ||
-					buzzerPayload.Timestamp.Before(h.lastTimestamp) {
+
+				if h.lastTimestamp < time.Now().UnixMilli() - 2000 ||
+					buzzerPayload.Timestamp < h.lastTimestamp {
 
 					h.lastTimestamp = buzzerPayload.Timestamp
 
