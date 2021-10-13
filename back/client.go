@@ -43,7 +43,7 @@ func getClientSeqNumber() int {
 	clientSeqLocker.Lock()
 	defer clientSeqLocker.Unlock()
 
-	clientSeqNumber = 1
+	clientSeqNumber += 1
 	return clientSeqNumber
 }
 

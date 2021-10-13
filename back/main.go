@@ -7,10 +7,11 @@ import (
 )
 
 
-
 func main() {
 	hub := NewHub()
 	go hub.run()
+
+	log.Println("LETS GO :8080")
 
 	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Access-Control-Allow-Origin", "*")

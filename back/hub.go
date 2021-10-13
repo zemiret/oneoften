@@ -10,12 +10,14 @@ import (
 
 type ClientState struct {
 	Lives int `json:"lives"`
+	SeqNumber int `json:"seqNumber"`
 }
 
 type MessageType string
 
 const (
 	MessageDecreaseLive MessageType = "DECREASE_LIVE"
+	MessagePlayerState MessageType = "PLAYER_STATE"
 	MessageBuzzer MessageType = "MESSAGE_BUZZER"
 )
 
@@ -65,8 +67,17 @@ func (h *Hub) run() {
 			h.Lock()
 			h.state[client] = &ClientState{
 				Lives: 3,
+				SeqNumber: client.seqNumber,
 			}
 			h.Unlock()
+
+			if err := client.SendMessage(
+				Message{
+					MessageType: MessagePlayerState,
+					Payload: h.state[client],
+				}); err != nil {
+				h.log.Printf("Err client.SendMessage %w", err)
+			}
 
 			//var roomForClient *Room
 			//if client.gameType == GameTypeDuel {
@@ -126,7 +137,11 @@ func (h *Hub) run() {
 					h.state[client].Lives -= 1
 				}
 
-				if err := client.SendMessage(h.state[client]); err != nil {
+				if err := client.SendMessage(
+					Message{
+						MessageType: MessagePlayerState,
+						Payload: h.state[client],
+					}); err != nil {
 					h.log.Printf("Err client.SendMessage %w", err)
 				}
 				h.Unlock()
@@ -144,7 +159,12 @@ func (h *Hub) run() {
 					h.lastTimestamp = buzzerPayload.Timestamp
 
 					for cForResp, _ := range h.state {
-						if err := cForResp.SendMessage(BuzzerResponse{SeqNumber: client.seqNumber}); err != nil {
+						if err := cForResp.SendMessage(
+							Message{
+								MessageType: MessageBuzzer,
+								Payload: BuzzerResponse{SeqNumber: client.seqNumber},
+							}); err != nil {
+
 							h.log.Printf("Err client.SendMessage %w", err)
 						}
 					}
