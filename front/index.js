@@ -1,4 +1,5 @@
-socketUrl = () => "ws://127.0.0.1:8080/ws"
+// socketUrl = () => "ws://127.0.0.1:8080/ws"
+socketUrl = () => "ws://amleczko.pl:8080/ws"
 
 let livesSec, buzzerSec, seqNumberSec;
 let liveBtn, buzzerBtn;

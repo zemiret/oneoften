@@ -147,12 +147,14 @@ func (h *Hub) run() {
 				h.Unlock()
 			case MessageBuzzer:
 				var buzzerPayload BuzzerPayload
-				if err := json.Unmarshal(inboundMessage.Message, &buzzerPayload); err != nil {
-					h.log.Println("Invalid message", err)
-					continue
-				}
+				//if err := json.Unmarshal(inboundMessage.Message, &buzzerPayload); err != nil {
+				//	h.log.Println("Invalid message", err)
+				//	continue
+				//}
 
 				h.Lock()
+
+				buzzerPayload.Timestamp = time.Now().UnixMilli() // WILL THIS WORK SOMEHOW? LATENCY CAN BE KILLER
 
 				if h.lastTimestamp < time.Now().UnixMilli() - 2000 ||
 					buzzerPayload.Timestamp < h.lastTimestamp {
